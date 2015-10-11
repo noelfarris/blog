@@ -31821,7 +31821,94 @@ module.exports = React.createClass({
 	}
 });
 
-},{"../models/postModel":169,"react":160}],162:[function(require,module,exports){
+},{"../models/postModel":170,"react":160}],162:[function(require,module,exports){
+'use strict';
+
+var React = require('react');
+var PostModel = require('../models/postModel');
+
+module.exports = React.createClass({
+	displayName: 'exports',
+
+	getInitialState: function getInitialState() {
+		return {
+			posts: []
+
+		};
+	},
+	componentWillMount: function componentWillMount() {
+		var _this = this;
+
+		var query = new Parse.Query(PostModel);
+		query.equalTo('user', new Parse.User({ objectId: this.props.userId }));
+		query.find().then(function (posts) {
+			console.log(posts);
+			_this.setState({ posts: posts });
+		}, function (err) {
+			console.log(err);
+		});
+	},
+
+	render: function render() {
+		var userPosts = this.state.posts.map(function (post) {
+			return React.createElement(
+				'div',
+				{ className: 'container' },
+				React.createElement(
+					'div',
+					{ className: 'row' },
+					React.createElement(
+						'h3',
+						null,
+						post.get('title')
+					)
+				),
+				React.createElement(
+					'div',
+					{ className: 'row' },
+					React.createElement(
+						'div',
+						null,
+						post.get('category'),
+						' '
+					)
+				),
+				React.createElement(
+					'div',
+					{ className: 'row' },
+					React.createElement('img', { src: post.get('image') })
+				),
+				React.createElement(
+					'div',
+					{ className: 'row' },
+					React.createElement(
+						'p',
+						null,
+						post.get('post')
+					)
+				),
+				React.createElement(
+					'div',
+					{ className: 'row' },
+					React.createElement(
+						'div',
+						null,
+						post.get('createdAt').toString()
+					)
+				)
+			);
+		});
+
+		return React.createElement(
+			'div',
+			{ className: 'container' },
+			userPosts
+		);
+	}
+
+});
+
+},{"../models/postModel":170,"react":160}],163:[function(require,module,exports){
 'use strict';
 
 var React = require('react');
@@ -31840,6 +31927,7 @@ module.exports = React.createClass({
 				var _this = this;
 
 				var query = new Parse.Query(PostModel);
+				query.include('user');
 				query.descending('createdAt');
 				query.find().then(function (posts) {
 						console.log(posts);
@@ -31850,7 +31938,9 @@ module.exports = React.createClass({
 		},
 
 		render: function render() {
+
 				var allPosts = this.state.posts.map(function (post) {
+						var currentUser = post.get('user');
 						return React.createElement(
 								'div',
 								{ className: 'row' },
@@ -31889,7 +31979,7 @@ module.exports = React.createClass({
 														{ className: 'card-action' },
 														React.createElement(
 																'a',
-																{ href: '#' },
+																{ href: "#findUserPost/" + currentUser.id },
 																'Posted by: ',
 																post.get('user').get('firstName'),
 																' ',
@@ -31914,7 +32004,7 @@ module.exports = React.createClass({
 		}
 });
 
-},{"../models/postModel":169,"react":160}],163:[function(require,module,exports){
+},{"../models/postModel":170,"react":160}],164:[function(require,module,exports){
 "use strict";
 
 var React = require('react');
@@ -32008,7 +32098,7 @@ module.exports = React.createClass({
 	}
 });
 
-},{"react":160}],164:[function(require,module,exports){
+},{"react":160}],165:[function(require,module,exports){
 'use strict';
 
 var React = require('react');
@@ -32126,7 +32216,7 @@ module.exports = React.createClass({
 	}
 });
 
-},{"backbone":1,"react":160}],165:[function(require,module,exports){
+},{"backbone":1,"react":160}],166:[function(require,module,exports){
 "use strict";
 
 var React = require('react');
@@ -32246,7 +32336,7 @@ module.exports = React.createClass({
 	}
 });
 
-},{"react":160}],166:[function(require,module,exports){
+},{"react":160}],167:[function(require,module,exports){
 'use strict';
 
 var React = require('react');
@@ -32275,6 +32365,7 @@ module.exports = React.createClass({
 	},
 
 	render: function render() {
+		var that = this;
 		var userPosts = this.state.posts.map(function (post) {
 			return React.createElement(
 				'div',
@@ -32320,6 +32411,11 @@ module.exports = React.createClass({
 						null,
 						post.get('createdAt').toString()
 					)
+				),
+				React.createElement(
+					'button',
+					{ onClick: that.deletePost, className: 'btn btn-danger' },
+					'Delete'
 				)
 			);
 		});
@@ -32329,11 +32425,15 @@ module.exports = React.createClass({
 			{ className: 'container' },
 			userPosts
 		);
+	},
+	deletePost: function deletePost() {
+		console.log(this.state.post);
+		this.state.posts.destroy();
+		this.props.router.navigate('', { trigger: true });
 	}
-
 });
 
-},{"../models/postModel":169,"react":160}],167:[function(require,module,exports){
+},{"../models/postModel":170,"react":160}],168:[function(require,module,exports){
 'use strict';
 
 var React = require('react');
@@ -32424,11 +32524,6 @@ module.exports = React.createClass({
 						null,
 						this.state.posts.get('createdAt').toString()
 					)
-				),
-				React.createElement(
-					'button',
-					{ onClick: this.deletePost, className: 'btn btn-danger' },
-					'Delete'
 				)
 			);
 		};
@@ -32438,14 +32533,11 @@ module.exports = React.createClass({
 			{ className: 'container' },
 			content
 		);
-	},
-	deletePost: function deletePost() {
-		this.state.posts.destroy();
-		this.props.router.navigate('', { trigger: true });
 	}
+
 });
 
-},{"../models/postModel":169,"react":160}],168:[function(require,module,exports){
+},{"../models/postModel":170,"react":160}],169:[function(require,module,exports){
 'use strict';
 
 Parse.initialize("AUPf1KJD34PVFz3JgkNzCUrnfPFyfqjve4mjM0e4", "bnAelwusvxhAEMjgDymNj5od3DxxDPo1KxwYTS9c");
@@ -32460,6 +32552,7 @@ var HomeComponent = require('./components/homeComponent');
 var AddPostComponent = require('./components/addPostComponent');
 var ViewPostComponent = require('./components/viewPostComponent');
 var UserPostComponent = require('./components/userPostComponent');
+var FindUserComponent = require('./components/findUserComponent');
 var app = document.getElementById('app');
 
 var Router = Backbone.Router.extend({
@@ -32470,7 +32563,8 @@ var Router = Backbone.Router.extend({
 		'register': 'register',
 		'addPost': 'addPost',
 		'viewPost/details/:id': 'viewPost',
-		'userPost/:id': 'userPost'
+		'userPost/:id': 'userPost',
+		'findUserPost/:id': 'findUserPost'
 	},
 	home: function home() {
 		ReactDOM.render(React.createElement(HomeComponent, { router: r }), app);
@@ -32489,6 +32583,9 @@ var Router = Backbone.Router.extend({
 	},
 	userPost: function userPost(id) {
 		ReactDOM.render(React.createElement(UserPostComponent, { router: r, userId: id }), app);
+	},
+	findUserPost: function findUserPost(id) {
+		ReactDOM.render(React.createElement(FindUserComponent, { router: r, userId: id }), app);
 	}
 });
 
@@ -32496,14 +32593,14 @@ var r = new Router();
 Backbone.history.start();
 ReactDOM.render(React.createElement(NavigationComponent, { router: r }), document.getElementById('nav'));
 
-},{"./components/addPostComponent":161,"./components/homeComponent":162,"./components/loginComponent":163,"./components/navigationComponent":164,"./components/registerComponent":165,"./components/userPostComponent":166,"./components/viewPostComponent":167,"backbone":1,"react":160,"react-dom":5}],169:[function(require,module,exports){
+},{"./components/addPostComponent":161,"./components/findUserComponent":162,"./components/homeComponent":163,"./components/loginComponent":164,"./components/navigationComponent":165,"./components/registerComponent":166,"./components/userPostComponent":167,"./components/viewPostComponent":168,"backbone":1,"react":160,"react-dom":5}],170:[function(require,module,exports){
 'use strict';
 
 module.exports = Parse.Object.extend({
 	className: 'Post'
 });
 
-},{}]},{},[168])
+},{}]},{},[169])
 
 
 //# sourceMappingURL=bundle.js.map

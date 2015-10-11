@@ -12,6 +12,7 @@ var HomeComponent = require('./components/homeComponent');
 var AddPostComponent = require('./components/addPostComponent');
 var ViewPostComponent = require('./components/viewPostComponent');
 var UserPostComponent = require('./components/userPostComponent');
+var FindUserComponent = require('./components/findUserComponent')
 var app = document.getElementById('app');
 
 var Router = Backbone.Router.extend({
@@ -22,7 +23,8 @@ var Router = Backbone.Router.extend({
 		'register': 'register',
 		'addPost': 'addPost',
 		'viewPost/details/:id': 'viewPost',
-		'userPost/:id': 'userPost'
+		'userPost/:id': 'userPost',
+		'findUserPost/:id': 'findUserPost'
 	},
 	home: function() {
 		ReactDOM.render(<HomeComponent router={r} />, app);
@@ -41,6 +43,9 @@ var Router = Backbone.Router.extend({
 	},
 	userPost: function(id) {
 		ReactDOM.render(<UserPostComponent router={r} userId={id} />, app);
+	},
+	findUserPost: function(id) {
+		ReactDOM.render(<FindUserComponent router={r} userId={id} />, app);
 	}
 })
 

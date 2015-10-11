@@ -11,6 +11,7 @@ module.exports = React.createClass({
 	},
 	componentWillMount: function() {
 	      var query = new Parse.Query(PostModel);
+	      query.include('user');
 	      query.descending('createdAt')
 	      query.find().then(
 	      	(posts) => {
@@ -24,7 +25,9 @@ module.exports = React.createClass({
 	},
 
 	render: function() {
+
 		var allPosts = this.state.posts.map(function(post) {
+			var currentUser = post.get('user');
 		return (
 				<div className="row">
         <div className="col s12 m10">
@@ -37,7 +40,7 @@ module.exports = React.createClass({
               <p>{post.get('post').substring(0, 140)}...</p>
             </div>
             <div className="card-action">
-              <a href="#">Posted by: {post.get('user').get('firstName')} {post.get('user').get('lastName')}</a>
+              <a href={"#findUserPost/" + currentUser.id}>Posted by: {post.get('user').get('firstName')} {post.get('user').get('lastName')}</a>
               <a href="#">Category: {post.get('category')}</a>
             </div>
           </div>

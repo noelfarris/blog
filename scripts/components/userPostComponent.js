@@ -25,6 +25,7 @@ module.exports = React.createClass({
 	},
 
 	render: function() {
+		var that = this;
 		var userPosts = this.state.posts.map(function(post) {
 		return (
 				<div className='container'>
@@ -43,6 +44,7 @@ module.exports = React.createClass({
 					<div className='row'>
 					<div>{post.get('createdAt').toString()}</div>
 					</div>
+					<button onClick={that.deletePost} className="btn btn-danger">Delete</button>
 				</div>
 
 		)
@@ -54,5 +56,9 @@ module.exports = React.createClass({
 			</div>
 		);
 	},
-	
+	deletePost: function() {
+		console.log(this.state.post);
+		this.state.posts.destroy();
+		this.props.router.navigate('', {trigger: true});
+	}
 });
