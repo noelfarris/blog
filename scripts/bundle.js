@@ -31813,40 +31813,108 @@ module.exports = React.createClass({
 			title: this.refs.title.value,
 			image: this.refs.image.value,
 			post: this.refs.post.value,
-			category: parseInt(this.refs.category.value),
+			category: this.refs.category.value,
 			user: Parse.User.current()
 		});
 		newPost.save();
+		this.props.router.navigate('', { trigger: true });
 	}
 });
 
-},{"../models/postModel":168,"react":160}],162:[function(require,module,exports){
+},{"../models/postModel":169,"react":160}],162:[function(require,module,exports){
 'use strict';
 
 var React = require('react');
+var PostModel = require('../models/postModel');
 
 module.exports = React.createClass({
-	displayName: 'exports',
+		displayName: 'exports',
 
-	render: function render() {
-		return React.createElement(
-			'section',
-			null,
-			React.createElement(
-				'div',
-				null,
-				React.createElement(
-					'h3',
-					null,
-					'Home'
-				)
-			)
-		);
-	}
+		getInitialState: function getInitialState() {
+				return {
+						posts: []
 
+				};
+		},
+		componentWillMount: function componentWillMount() {
+				var _this = this;
+
+				var query = new Parse.Query(PostModel);
+				query.descending('createdAt');
+				query.find().then(function (posts) {
+						console.log(posts);
+						_this.setState({ posts: posts });
+				}, function (err) {
+						console.log(err);
+				});
+		},
+
+		render: function render() {
+				var allPosts = this.state.posts.map(function (post) {
+						return React.createElement(
+								'div',
+								{ className: 'row' },
+								React.createElement(
+										'div',
+										{ className: 'col s12 m10' },
+										React.createElement(
+												'div',
+												{ className: 'card large' },
+												React.createElement(
+														'div',
+														{ className: 'card-image' },
+														React.createElement('img', { src: post.get('image') }),
+														React.createElement(
+																'a',
+																{ href: '#viewPost/details/' + post.id },
+																React.createElement(
+																		'span',
+																		{ className: 'card-title' },
+																		post.get('title')
+																)
+														)
+												),
+												React.createElement(
+														'div',
+														{ className: 'card-content' },
+														React.createElement(
+																'p',
+																null,
+																post.get('post').substring(0, 140),
+																'...'
+														)
+												),
+												React.createElement(
+														'div',
+														{ className: 'card-action' },
+														React.createElement(
+																'a',
+																{ href: '#' },
+																'Posted by: ',
+																post.get('user').get('firstName'),
+																' ',
+																post.get('user').get('lastName')
+														),
+														React.createElement(
+																'a',
+																{ href: '#' },
+																'Category: ',
+																post.get('category')
+														)
+												)
+										)
+								)
+						);
+				});
+				return React.createElement(
+						'div',
+						null,
+						allPosts
+				);
+		}
 });
 
-},{"react":160}],163:[function(require,module,exports){
+},{"../models/postModel":169,"react":160}],163:[function(require,module,exports){
 "use strict";
 
 var React = require('react');
@@ -31956,7 +32024,11 @@ module.exports = React.createClass({
 			_this.forceUpdate();
 		});
 	},
+	componentDidMount: function componentDidMount() {
+		$(".button-collapse").sideNav();
+	},
 	render: function render() {
+		var currentUser = Parse.User.current();
 		var currentPage = Backbone.history.getFragment();
 
 		var links = [React.createElement(
@@ -31964,7 +32036,7 @@ module.exports = React.createClass({
 			{ key: 'home', className: currentPage === '' ? 'active' : '' },
 			React.createElement(
 				'a',
-				{ href: '#home' },
+				{ href: '#' },
 				'Home'
 			)
 		)];
@@ -31990,11 +32062,11 @@ module.exports = React.createClass({
 			));
 			links.push(React.createElement(
 				'li',
-				{ key: 'viewPost', className: currentPage === 'viewPost' ? 'active' : '' },
+				{ key: 'userPost', className: currentPage === 'viewPost' ? 'active' : '' },
 				React.createElement(
 					'a',
-					{ href: '#viewPost' },
-					'View Post'
+					{ href: "#userPost/" + currentUser.id },
+					Parse.User.current().get('firstName')
 				)
 			));
 		} else {
@@ -32023,12 +32095,26 @@ module.exports = React.createClass({
 			{ className: 'nav-wrapper' },
 			React.createElement(
 				'a',
-				{ href: '#', className: 'brand-logo left' },
+				{ href: '#', className: 'brand-logo center' },
 				'Log Blog'
 			),
 			React.createElement(
+				'a',
+				{ href: '#', 'data-activates': 'mobile-demo', className: 'button-collapse' },
+				React.createElement(
+					'i',
+					{ className: 'material-icons' },
+					'menu'
+				)
+			),
+			React.createElement(
 				'ul',
-				{ id: 'nav-mobile', className: 'right' },
+				{ className: 'right hide-on-med-and-down' },
+				links
+			),
+			React.createElement(
+				'ul',
+				{ className: 'side-nav', id: 'mobile-demo' },
 				links
 			)
 		);
@@ -32179,7 +32265,7 @@ module.exports = React.createClass({
 		var _this = this;
 
 		var query = new Parse.Query(PostModel);
-		query.descending('createdAt');
+		query.equalTo('user', new Parse.User({ objectId: this.props.userId }));
 		query.find().then(function (posts) {
 			console.log(posts);
 			_this.setState({ posts: posts });
@@ -32189,7 +32275,7 @@ module.exports = React.createClass({
 	},
 
 	render: function render() {
-		var newPost = this.state.posts.map(function (post) {
+		var userPosts = this.state.posts.map(function (post) {
 			return React.createElement(
 				'div',
 				{ className: 'container' },
@@ -32200,6 +32286,16 @@ module.exports = React.createClass({
 						'h3',
 						null,
 						post.get('title')
+					)
+				),
+				React.createElement(
+					'div',
+					{ className: 'row' },
+					React.createElement(
+						'div',
+						null,
+						post.get('category'),
+						' '
 					)
 				),
 				React.createElement(
@@ -32222,24 +32318,140 @@ module.exports = React.createClass({
 					React.createElement(
 						'div',
 						null,
-						post.get('createdAt')
+						post.get('createdAt').toString()
 					)
 				)
 			);
 		});
-		return { newPost: newPost };
+
+		return React.createElement(
+			'div',
+			{ className: 'container' },
+			userPosts
+		);
+	}
+
+});
+
+},{"../models/postModel":169,"react":160}],167:[function(require,module,exports){
+'use strict';
+
+var React = require('react');
+var PostModel = require('../models/postModel');
+
+module.exports = React.createClass({
+	displayName: 'exports',
+
+	getInitialState: function getInitialState() {
+		return {
+			posts: null
+
+		};
+	},
+	componentWillMount: function componentWillMount() {
+		var _this = this;
+
+		var query = new Parse.Query(PostModel);
+		query.get(this.props.postId).then(function (posts) {
+			console.log(posts);
+			_this.setState({ posts: posts });
+		}, function (err) {
+			console.log(err);
+		});
+	},
+
+	render: function render() {
+		var content = React.createElement(
+			'div',
+			null,
+			'loading...'
+		);
+
+		if (this.state.posts) {
+			return React.createElement(
+				'div',
+				{ className: 'container' },
+				React.createElement(
+					'div',
+					{ className: 'row' },
+					React.createElement(
+						'h3',
+						null,
+						this.state.posts.get('title')
+					)
+				),
+				React.createElement(
+					'div',
+					{ className: 'row' },
+					React.createElement(
+						'div',
+						null,
+						this.state.posts.get('category'),
+						' '
+					)
+				),
+				React.createElement(
+					'div',
+					{ className: 'row' },
+					React.createElement('img', { src: this.state.posts.get('image') })
+				),
+				React.createElement(
+					'div',
+					{ className: 'row' },
+					React.createElement(
+						'p',
+						null,
+						this.state.posts.get('post')
+					)
+				),
+				React.createElement(
+					'div',
+					{ className: 'row' },
+					React.createElement(
+						'div',
+						null,
+						'Posted by ',
+						this.state.posts.get('user').get('firstName'),
+						' ',
+						this.state.posts.get('user').get('lastName')
+					)
+				),
+				React.createElement(
+					'div',
+					{ className: 'row' },
+					React.createElement(
+						'div',
+						null,
+						this.state.posts.get('createdAt').toString()
+					)
+				),
+				React.createElement(
+					'button',
+					{ onClick: this.deletePost, className: 'btn btn-danger' },
+					'Delete'
+				)
+			);
+		};
+
+		return React.createElement(
+			'div',
+			{ className: 'container' },
+			content
+		);
+	},
+	deletePost: function deletePost() {
+		this.state.posts.destroy();
+		this.props.router.navigate('', { trigger: true });
 	}
 });
 
-},{"../models/postModel":168,"react":160}],167:[function(require,module,exports){
+},{"../models/postModel":169,"react":160}],168:[function(require,module,exports){
 'use strict';
 
 Parse.initialize("AUPf1KJD34PVFz3JgkNzCUrnfPFyfqjve4mjM0e4", "bnAelwusvxhAEMjgDymNj5od3DxxDPo1KxwYTS9c");
 var React = require('react');
 var ReactDOM = require('react-dom');
 var Backbone = require('backbone');
-window.$ = require('jquery');
-window.jQuery = $;
 
 var NavigationComponent = require('./components/navigationComponent');
 var RegisterComponent = require('./components/registerComponent');
@@ -32247,6 +32459,7 @@ var LoginComponent = require('./components/loginComponent');
 var HomeComponent = require('./components/homeComponent');
 var AddPostComponent = require('./components/addPostComponent');
 var ViewPostComponent = require('./components/viewPostComponent');
+var UserPostComponent = require('./components/userPostComponent');
 var app = document.getElementById('app');
 
 var Router = Backbone.Router.extend({
@@ -32256,10 +32469,11 @@ var Router = Backbone.Router.extend({
 		'login': 'login',
 		'register': 'register',
 		'addPost': 'addPost',
-		'viewPost': 'viewPost'
+		'viewPost/details/:id': 'viewPost',
+		'userPost/:id': 'userPost'
 	},
 	home: function home() {
-		ReactDOM.render(React.createElement(HomeComponent, null), app);
+		ReactDOM.render(React.createElement(HomeComponent, { router: r }), app);
 	},
 	register: function register() {
 		ReactDOM.render(React.createElement(RegisterComponent, { router: r }), app);
@@ -32270,8 +32484,11 @@ var Router = Backbone.Router.extend({
 	addPost: function addPost() {
 		ReactDOM.render(React.createElement(AddPostComponent, { router: r }), app);
 	},
-	viewPost: function viewPost() {
-		ReactDOM.render(React.createElement(ViewPostComponent, { router: r }), app);
+	viewPost: function viewPost(id) {
+		ReactDOM.render(React.createElement(ViewPostComponent, { router: r, postId: id }), app);
+	},
+	userPost: function userPost(id) {
+		ReactDOM.render(React.createElement(UserPostComponent, { router: r, userId: id }), app);
 	}
 });
 
@@ -32279,14 +32496,14 @@ var r = new Router();
 Backbone.history.start();
 ReactDOM.render(React.createElement(NavigationComponent, { router: r }), document.getElementById('nav'));
 
-},{"./components/addPostComponent":161,"./components/homeComponent":162,"./components/loginComponent":163,"./components/navigationComponent":164,"./components/registerComponent":165,"./components/viewPostComponent":166,"backbone":1,"jquery":4,"react":160,"react-dom":5}],168:[function(require,module,exports){
+},{"./components/addPostComponent":161,"./components/homeComponent":162,"./components/loginComponent":163,"./components/navigationComponent":164,"./components/registerComponent":165,"./components/userPostComponent":166,"./components/viewPostComponent":167,"backbone":1,"react":160,"react-dom":5}],169:[function(require,module,exports){
 'use strict';
 
 module.exports = Parse.Object.extend({
 	className: 'Post'
 });
 
-},{}]},{},[167])
+},{}]},{},[168])
 
 
 //# sourceMappingURL=bundle.js.map

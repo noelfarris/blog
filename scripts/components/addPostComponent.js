@@ -56,9 +56,10 @@ module.exports = React.createClass({
 			title: this.refs.title.value,
 			image: this.refs.image.value,
 			post: this.refs.post.value,
-			category: parseInt(this.refs.category.value),
+			category: this.refs.category.value,
 			user: Parse.User.current(),
 		});
 		newPost.save();
+		this.props.router.navigate('', {trigger: true});
 	}
 });

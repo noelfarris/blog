@@ -5,14 +5,14 @@ module.exports = React.createClass({
 
 	getInitialState: function() {
 	    return ({
-	        posts: null
+	        posts: []
 
 	    });
 	},
 	componentWillMount: function() {
 	      var query = new Parse.Query(PostModel);
-	      query
-	      .get(this.props.postId)
+	      query.equalTo('user', new Parse.User({objectId: this.props.userId}));
+	      query.find()
 	      .then(
 	      	(posts) => {
 	      		console.log(posts);
@@ -25,42 +25,34 @@ module.exports = React.createClass({
 	},
 
 	render: function() {
-		var content = <div>loading...</div>;
-
-		if(this.state.posts) {
+		var userPosts = this.state.posts.map(function(post) {
 		return (
 				<div className='container'>
 					<div className='row'>
-					<h3>{this.state.posts.get('title')}</h3>
+					<h3>{post.get('title')}</h3>
 					</div>
 					<div className='row'>
-					<div>{this.state.posts.get('category')} </div>
+					<div>{post.get('category')} </div>
 					</div>
 					<div className='row'>
-					<img src={this.state.posts.get('image')} />
+					<img src={post.get('image')} />
 					</div>
 					<div className='row'>
-					<p>{this.state.posts.get('post')}</p>
+					<p>{post.get('post')}</p>
 					</div>
 					<div className='row'>
-					<div>Posted by {this.state.posts.get('user').get('firstName')} {this.state.posts.get('user').get('lastName')}</div>
+					<div>{post.get('createdAt').toString()}</div>
 					</div>
-					<div className='row'>
-					<div>{this.state.posts.get('createdAt').toString()}</div>
-					</div>
-					<button onClick={this.deletePost} className="btn btn-danger">Delete</button>
 				</div>
 
-		)};
+		)
+	});
 		
 		return (
 			<div className="container">
-				{content}
+				{userPosts}
 			</div>
 		);
 	},
-	deletePost: function() {
-		this.state.posts.destroy();
-		this.props.router.navigate('', {trigger: true});
-	}
+	
 });

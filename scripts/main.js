@@ -4,8 +4,6 @@ Parse.initialize("AUPf1KJD34PVFz3JgkNzCUrnfPFyfqjve4mjM0e4", "bnAelwusvxhAEMjgDy
 var React = require('react');
 var ReactDOM = require('react-dom');
 var Backbone = require('backbone');
-window.$ = require('jquery');
-window.jQuery = $;
 
 var NavigationComponent = require('./components/navigationComponent');
 var RegisterComponent = require('./components/registerComponent');
@@ -13,6 +11,7 @@ var LoginComponent = require('./components/loginComponent');
 var HomeComponent = require('./components/homeComponent');
 var AddPostComponent = require('./components/addPostComponent');
 var ViewPostComponent = require('./components/viewPostComponent');
+var UserPostComponent = require('./components/userPostComponent');
 var app = document.getElementById('app');
 
 var Router = Backbone.Router.extend({
@@ -22,10 +21,11 @@ var Router = Backbone.Router.extend({
 		'login': 'login',
 		'register': 'register',
 		'addPost': 'addPost',
-		'viewPost': 'viewPost'
+		'viewPost/details/:id': 'viewPost',
+		'userPost/:id': 'userPost'
 	},
 	home: function() {
-		ReactDOM.render(<HomeComponent />, app);
+		ReactDOM.render(<HomeComponent router={r} />, app);
 	},
 	register: function() {
 		ReactDOM.render(<RegisterComponent router={r} />, app);
@@ -36,8 +36,11 @@ var Router = Backbone.Router.extend({
 	addPost: function() {
 		ReactDOM.render(<AddPostComponent router={r} />, app);
 	},
-	viewPost: function() {
-		ReactDOM.render(<ViewPostComponent router={r} />, app);
+	viewPost: function(id) {
+		ReactDOM.render(<ViewPostComponent router={r} postId={id} />, app);
+	},
+	userPost: function(id) {
+		ReactDOM.render(<UserPostComponent router={r} userId={id} />, app);
 	}
 })
 
