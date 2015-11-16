@@ -37,7 +37,7 @@ module.exports = React.createClass({
 					<div>{this.state.posts.get('category')} </div>
 					</div>
 					<div className='row'>
-					<img src={this.state.posts.get('image')} />
+					<img src={this.state.posts.get('photo').url()} />
 					</div>
 					<div className='row'>
 					<p>{this.state.posts.get('post')}</p>

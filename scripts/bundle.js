@@ -31743,26 +31743,31 @@ module.exports = React.createClass({
 						{ className: 'row' },
 						React.createElement(
 							'div',
+							{ className: 'file-field input-field' },
+							React.createElement(
+								'div',
+								{ className: 'btn' },
+								React.createElement(
+									'span',
+									null,
+									'Your Photo'
+								),
+								React.createElement('input', { type: 'file', ref: 'profilePhoto' })
+							),
+							React.createElement(
+								'div',
+								{ className: 'file-path-wrapper' },
+								React.createElement('input', { className: 'file-path validate', type: 'text', ref: 'filePath' })
+							)
+						),
+						React.createElement(
+							'div',
 							{ className: 'input-field col s12' },
 							React.createElement('input', { type: 'text', ref: 'title', className: 'validate' }),
 							React.createElement(
 								'label',
 								null,
 								'Title'
-							)
-						)
-					),
-					React.createElement(
-						'div',
-						{ className: 'row' },
-						React.createElement(
-							'div',
-							{ className: 'input-field col s12' },
-							React.createElement('input', { type: 'text', ref: 'image', className: 'validate' }),
-							React.createElement(
-								'label',
-								null,
-								'Image URL'
 							)
 						)
 					),
@@ -31809,12 +31814,18 @@ module.exports = React.createClass({
 	},
 	onAddPost: function onAddPost(e) {
 		e.preventDefault();
+
+		var file = this.refs.profilePhoto.files[0];
+		var name = "photo.jpg";
+
+		var parseFile = new Parse.File(name, file);
+		console.log(typeof parseFile);
 		var newPost = new PostModel({
 			title: this.refs.title.value,
-			image: this.refs.image.value,
 			post: this.refs.post.value,
 			category: this.refs.category.value,
-			user: Parse.User.current()
+			user: Parse.User.current(),
+			photo: parseFile
 		});
 		newPost.save();
 		this.props.router.navigate('', { trigger: true });
@@ -31941,19 +31952,27 @@ module.exports = React.createClass({
 
 				var allPosts = this.state.posts.map(function (post) {
 						var currentUser = post.get('user');
+						console.log(typeof post.get('photo'));
+						var photo;
+						if (typeof post.get('photo') !== undefined) {
+								photo = post.get('photo').url();
+						} else {
+								photo = 'url: https://encrypted-tbn3.gstatic.com/images?q=tbn:ANd9GcQQGbNx9OqGcV5Rxd92EEKa_cE4HhGpIGS1dJFXQ19ybZaY0kLQ';
+						}
+
 						return React.createElement(
 								'div',
 								{ className: 'row' },
 								React.createElement(
 										'div',
-										{ className: 'col s12 m10' },
+										{ className: 'col s12 m10 l8 offset-m1 offset-l2' },
 										React.createElement(
 												'div',
 												{ className: 'card large' },
 												React.createElement(
 														'div',
 														{ className: 'card-image' },
-														React.createElement('img', { src: post.get('image') }),
+														React.createElement('img', { src: photo }),
 														React.createElement(
 																'a',
 																{ href: '#viewPost/details/' + post.id },
@@ -32256,6 +32275,25 @@ module.exports = React.createClass({
 						{ className: "row" },
 						React.createElement(
 							"div",
+							{ className: "file-field input-field" },
+							React.createElement(
+								"div",
+								{ className: "btn" },
+								React.createElement(
+									"span",
+									null,
+									"Your Photo"
+								),
+								React.createElement("input", { type: "file", ref: "profilePhoto" })
+							),
+							React.createElement(
+								"div",
+								{ className: "file-path-wrapper" },
+								React.createElement("input", { className: "file-path validate", type: "text" })
+							)
+						),
+						React.createElement(
+							"div",
 							{ className: "input-field col s12" },
 							React.createElement("input", { type: "text", ref: "firstName", id: "firstName" }),
 							React.createElement(
@@ -32270,8 +32308,8 @@ module.exports = React.createClass({
 							React.createElement("input", { type: "text", ref: "lastName", id: "lastName" }),
 							React.createElement(
 								"label",
-								{ htmlFor: "first_name" },
-								"Email Address"
+								{ htmlFor: "last_name" },
+								"Last Name"
 							)
 						),
 						React.createElement(
@@ -32317,12 +32355,20 @@ module.exports = React.createClass({
 
 		e.preventDefault();
 		var user = new Parse.User();
+		var fileUploadControl = this.refs.profilePhoto.value[0];
+		if (fileUploadControl.length > 0) {
+			var file = fileUploadControl[0];
+			var name = "photo.jpg";
+
+			var parseFile = new Parse.File(name, file);
+		}
 		user.signUp({
 			firstName: this.refs.firstName.value,
 			lastName: this.refs.lastName.value,
 			username: this.refs.email.value,
 			password: this.refs.password.value,
-			email: this.refs.email.value
+			email: this.refs.email.value,
+			photo: parseFile
 		}, {
 			success: function success(u) {
 				_this.props.router.navigate('', { trigger: true });
@@ -32493,7 +32539,7 @@ module.exports = React.createClass({
 				React.createElement(
 					'div',
 					{ className: 'row' },
-					React.createElement('img', { src: this.state.posts.get('image') })
+					React.createElement('img', { src: this.state.posts.get('photo').url() })
 				),
 				React.createElement(
 					'div',

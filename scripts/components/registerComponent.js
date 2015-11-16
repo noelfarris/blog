@@ -18,13 +18,22 @@ module.exports = React.createClass({
 						<h1>Register</h1>
 						{errorElement}
 						<div className="row">
-						<div className="input-field col s12">
+							<div className="file-field input-field">
+      							<div className="btn">
+        							<span>Your Photo</span>
+        							<input type="file" ref="profilePhoto" />
+      							</div>
+      							<div className="file-path-wrapper">
+       	 							<input className="file-path validate" type="text" />
+      							</div>
+    						</div>
+							<div className="input-field col s12">
 								<input type="text" ref="firstName" id="firstName" />
 								<label htmlFor="first_name">First Name</label>
 							</div>
-						<div className="input-field col s12">
+							<div className="input-field col s12">
 								<input type="text" ref="lastName" id="lastName" />
-								<label htmlFor="first_name">Email Address</label>
+								<label htmlFor="last_name">Last Name</label>
 							</div>
 							<div className="input-field col s12">
 								<input type="text" ref="email" className="validate" id="email_address" />
@@ -48,13 +57,21 @@ module.exports = React.createClass({
 	onRegister: function(e) {
 		e.preventDefault();
 		var user = new Parse.User();
+		var fileUploadControl = this.refs.profilePhoto.value[0];
+		if (fileUploadControl.length > 0) {
+  			var file = fileUploadControl[0];
+  			var name = "photo.jpg";
+
+  			var parseFile = new Parse.File(name, file);
+		}
 		user.signUp(
 			{
 				firstName: this.refs.firstName.value,
 				lastName: this.refs.lastName.value,
 				username: this.refs.email.value,
 				password: this.refs.password.value,
-				email: this.refs.email.value
+				email: this.refs.email.value,
+				photo: parseFile
 			},
 			{
 				success: (u) => {

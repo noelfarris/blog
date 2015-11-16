@@ -19,15 +19,18 @@ module.exports = React.createClass({
 						<h1>Add Post</h1>
 						{errorElement}
 						<div className="row">
+							<div className="file-field input-field">
+      							<div className="btn">
+        							<span>Your Photo</span>
+        							<input type="file" ref="profilePhoto" />
+      							</div>
+      							<div className="file-path-wrapper">
+       	 							<input className="file-path validate" type="text" ref="filePath" />
+      							</div>
+    						</div>
 							<div className="input-field col s12">
 								<input type="text" ref="title" className="validate" />
 								<label>Title</label>
-							</div>
-						</div>
-						<div className="row">
-							<div className="input-field col s12">
-								<input type="text" ref="image" className="validate" />
-								<label>Image URL</label>
 							</div>
 						</div>
 						<div className="row">
@@ -52,12 +55,18 @@ module.exports = React.createClass({
 	},
 	onAddPost: function(e) {
 		e.preventDefault();
+		
+		var file = this.refs.profilePhoto.files[0];
+  		var name = "photo.jpg";
+
+  		var parseFile = new Parse.File(name, file);
+  		console.log(typeof parseFile);
 		var newPost = new PostModel({
 			title: this.refs.title.value,
-			image: this.refs.image.value,
 			post: this.refs.post.value,
 			category: this.refs.category.value,
 			user: Parse.User.current(),
+			photo: parseFile
 		});
 		newPost.save();
 		this.props.router.navigate('', {trigger: true});
