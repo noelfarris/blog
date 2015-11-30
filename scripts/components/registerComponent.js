@@ -1,5 +1,6 @@
 var React = require('react');
 
+// component to register new user
 module.exports = React.createClass({
 	getInitialState: function() {
 		return { error: null };

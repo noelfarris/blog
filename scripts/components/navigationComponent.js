@@ -1,7 +1,7 @@
 var React = require('react');
 var Backbone = require('backbone');
 
-
+// Navigation bar component with links for active and non-active users
 	
 
 module.exports = React.createClass({
@@ -16,7 +16,7 @@ module.exports = React.createClass({
 	render: function() {
 		var currentUser = Parse.User.current();
 		var currentPage = Backbone.history.getFragment();
-
+		// looking for active user and displaying appropriate links
 		var links = [
 			<li key="home" className={currentPage === '' ? 'active' : ''}><a href="#">Home</a></li>,
 		];

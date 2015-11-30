@@ -1,5 +1,6 @@
 var React = require('react');
 
+// component that allows users to login
 module.exports = React.createClass({
 	getInitialState: function() {
 		return { error: null };

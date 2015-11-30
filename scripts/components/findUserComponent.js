@@ -1,6 +1,7 @@
 var React = require('react');
 var PostModel = require('../models/postModel')
 
+// Component allows users to click on the username link to see all posts from that user
 module.exports = React.createClass({
 
 	getInitialState: function() {
@@ -9,6 +10,7 @@ module.exports = React.createClass({
 
 	    });
 	},
+	// this parse query finds the user id of selected username and posts associated with user
 	componentWillMount: function() {
 	      var query = new Parse.Query(PostModel);
 	      query.equalTo('user', new Parse.User({objectId: this.props.userId}));

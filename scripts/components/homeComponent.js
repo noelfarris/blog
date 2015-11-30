@@ -1,6 +1,8 @@
 var React = require('react');
 var PostModel = require('../models/postModel')
 
+
+// component displays all posts from all users
 module.exports = React.createClass({
 
 	getInitialState: function() {
@@ -9,6 +11,7 @@ module.exports = React.createClass({
 
 	    });
 	},
+	// parse query that finds all posts in the post model
 	componentWillMount: function() {
 	      var query = new Parse.Query(PostModel);
 	      query.include('user');

@@ -1,6 +1,7 @@
 var React = require('react');
 var PostModel = require('../models/postModel')
 
+// This component displays posts from current user and allows them to remove posts
 module.exports = React.createClass({
 
 	getInitialState: function() {

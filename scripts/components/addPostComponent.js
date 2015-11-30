@@ -1,6 +1,8 @@
 var React = require('react');
 var PostModel = require('../models/postModel')
 
+// this component will allow users to add posts
+// getting initial state of error object and rendering component
 module.exports = React.createClass({
 	getInitialState: function() {
 		return { error: null };
@@ -53,6 +55,7 @@ module.exports = React.createClass({
 			</div>
 		);
 	},
+	// function creates parse object and saves user input
 	onAddPost: function(e) {
 		e.preventDefault();
 		

@@ -1,6 +1,7 @@
 var React = require('react');
 var PostModel = require('../models/postModel')
 
+// This component allows a user to see an individual post
 module.exports = React.createClass({
 
 	getInitialState: function() {
